@@ -1,92 +1,157 @@
-# Grey Wolf Optimizer (GWO) - README
+# Grey Wolf Optimizer (GWO) - Implémentation CUDA
+
+## Description
+
+Ce projet implémente l’algorithme d’optimisation **Grey Wolf Optimizer (GWO)** en utilisant CUDA afin d’exploiter le parallélisme GPU.
+
+L’objectif est d’accélérer les calculs par rapport à une version séquentielle CPU, notamment pour :
+- l’évaluation des fonctions de fitness
+- la mise à jour des positions
+- la sélection des meilleurs individus
+
+Plusieurs fonctions de test sont utilisées :
+- Rastrigin
+- Rosenbrock
+- Ackley
+
+L’objectif est également d’évaluer les performances de l’implémentation GPU en termes de qualité des solutions et de temps d’exécution, sur différentes dimensions et tailles de population.
 
 ## Prérequis
 
-Avant d'exécuter ce code, il est nécessaire de s'assurer que les éléments suivants sont installés sur le système :
+Avant d'exécuter ce code, assurez-vous d'avoir installé les éléments suivants sur votre système :
 
-1. **Compilateur C++ compatible avec la norme C++20 :** Ce projet a été développé en utilisant la norme C++20. Il est donc essentiel d'utiliser un compilateur compatible, tel que **g++ version 10** ou supérieur, ou un compilateur équivalent pour Windows (MinGW ou MSVC).
+1. **CUDA Toolkit et pilotes NVIDIA :**  
+   Ce projet utilise CUDA pour l’accélération GPU. Installez le **CUDA Toolkit 12.4** et le **pilote NVIDIA 560.94** ou supérieur. Le compilateur utilisé est **nvcc 12.4**.
 
-2. **CMake :** Il est nécessaire d'avoir CMake installé. CMake est un outil de gestion de la compilation qui permet de configurer et de compiler le code de manière portable.
+2. **Compilateur C++ compatible avec C++17 :**  
+   Le code nécessite un compilateur C++ compatible avec la norme C++17 (MSVC via Visual Studio 2022 sur Windows).  
 
-3. **Terminal ou IDE :** Le code peut être exécuté soit via la ligne de commande, soit à l'aide d'un IDE tel que **CLion**, **Visual Studio Code** ou un autre IDE compatible avec CMake.
+3. **CMake :**  
+   CMake 3.18 ou supérieur est nécessaire pour la compilation et la configuration du projet.  
 
-## Installation et Exécution
+4. **Terminal ou IDE :**  
+   Vous pouvez utiliser la **ligne de commande Windows** (X64 Native Tools Command Prompt for VS 2022) ou un IDE compatible avec CMake, comme **CLion** ou **Visual Studio**.
 
-### Exécution sans CMake (Compilation manuelle avec g++)
+---
 
-Il est possible de compiler et exécuter le programme manuellement avec g++. Voici les étapes nécessaires :
+## Configuration matérielle utilisée
 
-1. Ouvrir un terminal et naviguer jusqu'au dossier contenant les fichiers du projet.
+Les expériences ont été réalisées sur une machine de bureau avec :  
 
-2. Compiler le code avec la commande g++ en utilisant la norme C++20 :
+- **CPU :** Intel Core i5-2500, 3,30 GHz, 4 cœurs physiques  
+- **RAM :** 16 Go  
+- **GPU :** NVIDIA GeForce GTX 960, 4 Go de mémoire globale  
+- **OS :** Windows 10 Professionnel (version 10.0.19045)  
+- **CUDA :** Toolkit 12.4, pilote 560.94  
 
-    ```bash
-    g++ -std=c++20 -o gwo_optimizer main.cpp utils/Agent.cpp utils/Problem.cpp OriginalGWO.cpp
+---
+
+## Compilation et Exécution
+
+### 1. Compilation avec nvcc (ligne de commande Windows)
+
+1. Ouvrir le **X64 Native Tools Command Prompt for VS 2022** :  
+   - Cliquer sur le menu Windows, taper « X64 Native Tools Command Prompt for VS 2022 » et ouvrir.  
+
+2. Se rendre dans le dossier du projet :  
+
+    ```cmd
+    cd /d "C:\Users\ad\Desktop\calcul massive parallèle\GWO"
     ```
 
-   Cette commande génère un fichier exécutable nommé **gwo_optimizer**.
+3. Compiler les fichiers CUDA et C++ avec **nvcc** :  
 
-3. Pour exécuter le programme, il suffit de saisir la commande suivante dans le terminal :
-
-    ```bash
-    ./gwo_optimizer
+    ```cmd
+    nvcc main.cpp kernel.cu -o gwo.exe
     ```
 
-   Cette commande lancera le programme et effectuera l'optimisation.
+    Cette commande génère l’exécutable **gwo.exe**.  
 
-### Exécution avec CMake
+4. Exécuter le programme :  
 
-Il est aussi possible d'exécuter avec CMake, voici les étapes à suivre pour compiler et exécuter le programme :
+    ```cmd
+    gwo.exe
+    ```
 
-1. Ouvrir un terminal et se rendre dans le dossier contenant les fichiers du projet.
+---
 
-2. Créer un répertoire de build pour la compilation :
+### 2. Compilation avec CMake
 
-    ```bash
+Le projet peut également être compilé avec CMake, qui gère automatiquement CUDA et C++.
+
+1. Ouvrir un terminal (ou PowerShell) et se placer dans le dossier du projet :  
+
+    ```cmd
+    cd /d "C:\Users\ad\Desktop\calcul massive parallèle\GWO"
+    ```
+
+2. Créer un dossier de compilation :  
+
+    ```cmd
     mkdir build
     cd build
     ```
 
-3. Utiliser **CMake** pour configurer le projet et générer les fichiers nécessaires à la compilation :
+3. Configurer le projet avec CMake :  
 
-    ```bash
+    ```cmd
     cmake ..
     ```
 
-   Cela génère les fichiers de construction pour **g++** (ou un autre compilateur compatible) à partir du fichier **CMakeLists.txt**.
+4. Compiler avec `cmake --build` :  
 
-4. Compiler le projet avec **make** :
-
-    ```bash
-    make
+    ```cmd
+    cmake --build . --config Release
     ```
 
-   Cette étape crée l'exécutable **GWO_C**.
+    - L’exécutable généré sera **mon_exec.exe**.  
 
-5. Une fois la compilation terminée, il est possible d'exécuter le programme en utilisant la commande suivante :
+5. Lancer le programme :  
 
-    ```bash
-    ./GWO_C
+    ```cmd
+    mon_exec.exe
     ```
 
-   Cela lancera le programme et effectuera l'optimisation.
+---
 
-### Exécution avec un IDE (par exemple, CLion)
+### 3. Exécution avec un IDE (Visual Studio ou CLion)
 
-Si un IDE comme CLion est utilisé, voici la procédure pour exécuter le programme avec CMake :
+Si vous utilisez un IDE compatible avec CMake et CUDA :  
 
-1. Ouvrir le projet dans CLion :
-    * Lancer CLion.
-    * Sélectionner **Open** et choisir le dossier contenant le code source (le dossier où se trouve le fichier **CMakeLists.txt**).
+1. **Ouvrir le projet dans l’IDE :**  
+   - Choisir le dossier contenant `CMakeLists.txt`.  
 
-2. Configurer CMake dans CLion :
-    * CLion détectera automatiquement le fichier **CMakeLists.txt** et proposera de configurer le projet.
-    * Il est important de s'assurer que CMake et un compilateur compatible C++20 (comme **g++ version 10** ou supérieur) sont correctement configurés dans les paramètres de CLion.
+2. **Configurer CMake et CUDA :**  
+   - L’IDE détectera automatiquement CUDA et le compilateur MSVC.  
+   - Vérifier que CMake utilise bien le standard C++17 et CUDA 17.  
 
-3. Compiler et exécuter dans CLion :
-    * Une fois la configuration terminée, il est possible de cliquer sur le bouton **Run** dans CLion pour compiler et exécuter le programme.
-    * **CLion** s'occupera de la gestion de la compilation via CMake et lancera l'exécution automatiquement.
+3. **Compiler et exécuter :**  
+   - Cliquer sur **Run** ou **Build & Run** selon l’IDE.  
+   - L’exécutable sera généré et lancé automatiquement.
 
+---
+
+## Résultats
+
+Le programme génère deux fichiers CSV :
+
+- `execution_results.csv` :
+  Contient les résultats détaillés de chaque exécution (fitness finale et temps d’exécution).
+
+- `mean_std_fitness.csv` :
+  Contient les statistiques (moyenne et écart-type des fitness et des temps).
+
+## Accélération GPU (CUDA)
+
+Cette version utilise CUDA pour :
+
+- paralléliser le calcul des fitness
+- accélérer la mise à jour des positions des loups
+- effectuer la sélection des meilleurs individus en parallèle
+
+Cela permet de réduire significativement le temps d’exécution par rapport à une version CPU séquentielle.
+
+---
 
 Auteur : **SEBO Amil**  
-Date : **20 février 2025**
+Date : **16 avril 2026** 
